@@ -11,6 +11,13 @@ Tests that the provided typeDefs return the correct schema (with cypher directiv
 ```graphql
 type Actor {
     name: String
+    totalScreenTime: Int!
+        @cypher(
+            statement: """
+            MATCH (this)-[r:ACTED_IN]->(:Movie)
+            RETURN sum(r.screenTime)
+            """
+        )
 }
 
 type Movie {
@@ -45,6 +52,7 @@ type UpdateInfo {
 
 type Actor {
     name: String
+    totalScreenTime: Int!
 }
 
 input ActorCreateInput {
@@ -65,6 +73,7 @@ Fields to sort Actors by. The order in which sorts are applied is not guaranteed
 """
 input ActorSort {
     name: SortDirection
+    totalScreenTime: SortDirection
 }
 
 input ActorUpdateInput {
