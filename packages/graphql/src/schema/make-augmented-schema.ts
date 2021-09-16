@@ -193,12 +193,14 @@ function makeAugmentedSchema(
 
     const aggregationSelectionTypeNames = aggregationSelectionTypeMatrix.map(([name]) => name);
 
-    const aggregationSelectionTypes = aggregationSelectionTypeMatrix.reduce<Record<string, ObjectTypeComposer<unknown, unknown>>>((res, [name, fields]) => {
+    const aggregationSelectionTypes = aggregationSelectionTypeMatrix.reduce<
+        Record<string, ObjectTypeComposer<unknown, unknown>>
+    >((res, [name, fields]) => {
         return {
             ...res,
             [name]: composer.createObjectTC({
                 name: `${name}AggregateSelection`,
-                fields: fields ? fields : { min: `${name}!`, max: `${name}!` },
+                fields: fields || { min: `${name}!`, max: `${name}!` },
             }),
         };
     }, {});
@@ -566,6 +568,21 @@ function makeAugmentedSchema(
             ...node.scalarFields,
             ...node.temporalFields,
             ...node.pointFields,
+            ...node.cypherFields.filter((field) =>
+                [
+                    "Boolean",
+                    "ID",
+                    "Int",
+                    "BigInt",
+                    "Float",
+                    "String",
+                    "DateTime",
+                    "LocalDateTime",
+                    "Time",
+                    "LocalTime",
+                    "Date",
+                ].includes(field.typeMeta.name)
+            ),
         ].reduce((res, f) => {
             return f.typeMeta.array
                 ? {
