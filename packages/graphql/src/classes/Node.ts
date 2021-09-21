@@ -81,9 +81,9 @@ class Node {
     public auth?: Auth;
     public description?: string;
 
-    /*
-        Fields you can apply auth allow and bind to
-    */
+    /**
+     * Fields you can apply auth allow and bind to
+     */
     public authableFields: (
         | PrimitiveField
         | CustomScalarField
@@ -95,9 +95,9 @@ class Node {
         | CypherField
     )[];
 
-    /*
-        Fields you can set in a create or update mutation
-    */
+    /**
+     * Fields you can set in a create or update mutation
+     */
     public mutableFields: (
         | PrimitiveField
         | CustomScalarField
@@ -106,6 +106,18 @@ class Node {
         | ObjectField
         | TemporalField
         | PointField
+    )[];
+
+    /**
+     * Fields you can sort on
+     */
+    public sortableFields: (
+        | PrimitiveField
+        | CustomScalarField
+        | CustomEnumField
+        | TemporalField
+        | PointField
+        | CypherField
     )[];
 
     constructor(input: NodeConstructor) {
@@ -151,6 +163,30 @@ class Node {
             ...input.unionFields,
             ...input.pointFields,
         ];
+
+        this.sortableFields = [
+            ...input.primitiveFields,
+            ...input.scalarFields,
+            ...input.enumFields,
+            ...input.temporalFields,
+            ...input.pointFields,
+            ...input.cypherFields.filter((field) =>
+                [
+                    "Boolean",
+                    "ID",
+                    "Int",
+                    "BigInt",
+                    "Float",
+                    "String",
+                    "DateTime",
+                    "LocalDateTime",
+                    "Time",
+                    "LocalTime",
+                    "Date",
+                    "Duration",
+                ].includes(field.typeMeta.name)
+            ),
+        ].filter((field) => !field.typeMeta.array);
     }
 
     get labelString(): string {
