@@ -22,6 +22,7 @@ import { Neo4jGraphQLAuthenticationError, Node } from "../classes";
 import { AuthOperations, BaseField, AuthRule, BaseAuthRule, Context } from "../types";
 import { AUTH_UNAUTHENTICATED_ERROR } from "../constants";
 import mapToDbProperty from "../utils/map-to-db-property";
+import joinPredicates from "../utils/join-predicates";
 
 type AuthFieldModifier = "_NOT" | "_IN" | "_NOT_IN" | "_INCLUDES" | "_NOT_INCLUDES" | "_EVERY" | "_NOT_EVERY";
 
@@ -104,7 +105,7 @@ function createAuthPredicate({
                     res.params = { ...res.params, ...authPredicate[1] };
                 });
 
-                res.strs.push(`(${inner.join(` ${key} `)})`);
+                res.strs.push(joinPredicates(inner, key as "AND" | "OR"));
             }
 
             let fieldName = key;
@@ -223,7 +224,7 @@ function createAuthPredicate({
         { params: {}, strs: [] }
     );
 
-    return [result.strs.join(" AND "), result.params];
+    return [joinPredicates(result.strs, "AND"), result.params];
 }
 
 function createAuthAndParams({
@@ -329,7 +330,7 @@ function createAuthAndParams({
                 predicateParams = { ...predicateParams, ...par };
             });
 
-            thisPredicates.push(predicates.join(` ${key} `));
+            thisPredicates.push(joinPredicates(predicates, key as "AND" | "OR"));
             thisParams = { ...thisParams, ...predicateParams };
         });
 
@@ -363,7 +364,7 @@ function createAuthAndParams({
             }
         }
 
-        return [thisPredicates.join(" AND "), thisParams];
+        return [joinPredicates(thisPredicates, "AND"), thisParams];
     }
 
     const subPredicates = authRules.reduce(
@@ -378,7 +379,9 @@ function createAuthAndParams({
         { strs: [], params: {} }
     );
 
-    return [subPredicates.strs.filter(Boolean).join(" OR "), subPredicates.params];
+    const filteredSubPredicates = subPredicates.strs.filter(Boolean);
+
+    return [joinPredicates(filteredSubPredicates, "OR"), subPredicates.params];
 }
 
 export default createAuthAndParams;
