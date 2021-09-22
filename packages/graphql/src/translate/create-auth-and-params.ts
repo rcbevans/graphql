@@ -22,7 +22,7 @@ import { Neo4jGraphQLAuthenticationError, Node } from "../classes";
 import { AuthOperations, BaseField, AuthRule, BaseAuthRule, Context } from "../types";
 import { AUTH_UNAUTHENTICATED_ERROR } from "../constants";
 import mapToDbProperty from "../utils/map-to-db-property";
-import joinPredicates from "../utils/join-predicates";
+import joinPredicates, { isPredicateJoin, PREDICATE_JOINS } from "../utils/join-predicates";
 
 type AuthFieldModifier = "_NOT" | "_IN" | "_NOT_IN" | "_INCLUDES" | "_NOT_INCLUDES" | "_EVERY" | "_NOT_EVERY";
 
@@ -85,7 +85,7 @@ function createAuthPredicate({
 
     const result = Object.entries(rule[kind] as any).reduce(
         (res: Res, [key, value]) => {
-            if (key === "AND" || key === "OR") {
+            if (isPredicateJoin(key)) {
                 const inner: string[] = [];
 
                 (value as any[]).forEach((v, i) => {
@@ -105,7 +105,7 @@ function createAuthPredicate({
                     res.params = { ...res.params, ...authPredicate[1] };
                 });
 
-                res.strs.push(joinPredicates(inner, key as "AND" | "OR"));
+                res.strs.push(joinPredicates(inner, key));
             }
 
             let fieldName = key;
@@ -305,7 +305,7 @@ function createAuthAndParams({
             }
         }
 
-        ["AND", "OR"].forEach((key) => {
+        PREDICATE_JOINS.forEach((key) => {
             const value = authRule[key] as AuthRule["AND"] | AuthRule["OR"];
 
             if (!value) {
@@ -330,7 +330,7 @@ function createAuthAndParams({
                 predicateParams = { ...predicateParams, ...par };
             });
 
-            thisPredicates.push(joinPredicates(predicates, key as "AND" | "OR"));
+            thisPredicates.push(joinPredicates(predicates, key));
             thisParams = { ...thisParams, ...predicateParams };
         });
 
@@ -379,9 +379,7 @@ function createAuthAndParams({
         { strs: [], params: {} }
     );
 
-    const filteredSubPredicates = subPredicates.strs.filter(Boolean);
-
-    return [joinPredicates(filteredSubPredicates, "OR"), subPredicates.params];
+    return [joinPredicates(subPredicates.strs, "OR"), subPredicates.params];
 }
 
 export default createAuthAndParams;
