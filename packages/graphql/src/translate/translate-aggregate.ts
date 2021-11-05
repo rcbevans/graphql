@@ -125,7 +125,7 @@ function translateAggregate({ node, context }: { node: Node; context: Context })
 
             Object.entries(selection[1].fieldsByTypeName[`${field.typeMeta.name}AggregateSelection`]).forEach(
                 (entry) => {
-                    // "min" | "max" | "average" | "shortest" | "longest"
+                    // "min" | "max" | "average" | "shortest" | "longest" | "values"
                     let operator = entry[1].name;
 
                     if (operator === "average") {
@@ -140,19 +140,38 @@ function translateAggregate({ node, context }: { node: Node; context: Context })
                         operator = "max";
                     }
 
+                    if (operator === "values") {
+                        operator = "collect";
+                    }
+
                     const fieldName = field.dbPropertyName || field.fieldName;
 
                     if (isDateTime) {
                         thisProjections.push(
                             createDatetimeElement({
                                 resolveTree: entry[1],
-                                field: field as TemporalField,
+                                field:
+                                    operator === "collect"
+                                        ? {
+                                              ...field,
+                                              typeMeta: {
+                                                  ...field.typeMeta,
+                                                  array: true,
+                                              },
+                                          }
+                                        : (field as TemporalField),
                                 variable: varName,
-                                valueOverride: `${operator}(this.${fieldName})`,
+                                valueOverride: `${operator}(${
+                                    operator === "collect" ? "distinct " : ""
+                                }this.${fieldName})`,
                             })
                         );
                     } else {
-                        thisProjections.push(`${entry[1].alias || entry[1].name}: ${operator}(this.${fieldName})`);
+                        thisProjections.push(
+                            `${entry[1].alias || entry[1].name}: ${operator}(${
+                                operator === "collect" ? "distinct " : ""
+                            }this.${fieldName})`
+                        );
                     }
                 }
             );

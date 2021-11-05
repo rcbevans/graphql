@@ -150,6 +150,7 @@ function makeAugmentedSchema(
             {
                 shortest: composeId,
                 longest: composeId,
+                values: "[ID]",
             },
         ],
         [
@@ -157,6 +158,7 @@ function makeAugmentedSchema(
             {
                 shortest: "String!",
                 longest: "String!",
+                values: "[String]",
             },
         ],
         [
@@ -165,6 +167,7 @@ function makeAugmentedSchema(
                 max: composeFloat,
                 min: composeFloat,
                 average: composeFloat,
+                values: "[Float]",
             },
         ],
         [
@@ -173,6 +176,7 @@ function makeAugmentedSchema(
                 max: composeInt,
                 min: composeInt,
                 average: composeFloat,
+                values: "[Int]",
             },
         ],
         [
@@ -181,6 +185,7 @@ function makeAugmentedSchema(
                 max: "BigInt!",
                 min: "BigInt!",
                 average: "BigInt!",
+                values: "[BigInt]",
             },
         ],
         ["DateTime"],
@@ -199,7 +204,7 @@ function makeAugmentedSchema(
             ...res,
             [name]: composer.createObjectTC({
                 name: `${name}AggregateSelection`,
-                fields: fields ?? { min: `${name}!`, max: `${name}!` },
+                fields: fields || { min: `${name}!`, max: `${name}!`, values: `[${name}]` },
             }),
         };
     }, {});
