@@ -17,11 +17,21 @@
  * limitations under the License.
  */
 
-import defaultFieldResolver from "./defaultField";
 import { Integer, isInt } from "neo4j-driver";
+import defaultFieldResolver from "./defaultField";
 
 function id(source, args, context, info) {
     const value = defaultFieldResolver(source, args, context, info);
+
+    if (Array.isArray(value)) {
+        return value.map((v) => {
+            if (isInt(v)) {
+                return (v as Integer).toNumber();
+            }
+
+            return v;
+        });
+    }
 
     // @ts-ignore: outputValue is unknown, and to cast to object would be an antipattern
     if (isInt(value)) {

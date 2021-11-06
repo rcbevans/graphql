@@ -131,14 +131,32 @@ function makeAugmentedSchema(
         args: {},
     };
 
+    const composeIntArray = {
+        type: "[Int]",
+        resolve: numericalResolver,
+        args: {},
+    };
+
     const composeFloat = {
         type: "Float!",
         resolve: numericalResolver,
         args: {},
     };
 
+    const composeFloatArray = {
+        type: "[Float]",
+        resolve: numericalResolver,
+        args: {},
+    };
+
     const composeId = {
         type: "ID!",
+        resolve: idResolver,
+        args: {},
+    };
+
+    const composeIdArray = {
+        type: "[ID]",
         resolve: idResolver,
         args: {},
     };
@@ -150,7 +168,7 @@ function makeAugmentedSchema(
             {
                 shortest: composeId,
                 longest: composeId,
-                values: "[ID]",
+                values: composeIdArray,
             },
         ],
         [
@@ -167,7 +185,7 @@ function makeAugmentedSchema(
                 max: composeFloat,
                 min: composeFloat,
                 average: composeFloat,
-                values: "[Float]",
+                values: composeFloatArray,
             },
         ],
         [
@@ -176,7 +194,7 @@ function makeAugmentedSchema(
                 max: composeInt,
                 min: composeInt,
                 average: composeFloat,
-                values: "[Int]",
+                values: composeIntArray,
             },
         ],
         [
