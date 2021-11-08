@@ -140,6 +140,7 @@ describe("200", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Mutation {
@@ -164,6 +165,7 @@ describe("200", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateCategoriesMutationResponse {

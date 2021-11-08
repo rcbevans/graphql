@@ -78,12 +78,14 @@ describe("162", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             type Mutation {

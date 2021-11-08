@@ -266,6 +266,7 @@ describe("Alias", () => {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             type Movie {
@@ -365,6 +366,7 @@ describe("Alias", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {

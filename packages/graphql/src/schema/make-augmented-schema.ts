@@ -161,7 +161,7 @@ function makeAugmentedSchema(
         args: {},
     };
 
-    // Foreach i if i[1] is ? then we will assume it takes on type { min, max }
+    // Foreach i if i[1] is ? then we will assume it takes on type { min, max, values }
     const aggregationSelectionTypeMatrix: [string, any?][] = [
         [
             "ID",

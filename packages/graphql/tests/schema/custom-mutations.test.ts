@@ -81,6 +81,7 @@ describe("Custom-mutations", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {

@@ -645,6 +645,7 @@ describe("Unions", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateAuthorsMutationResponse {

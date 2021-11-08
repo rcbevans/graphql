@@ -67,6 +67,7 @@ describe("Null", () => {
             type DateTimeAggregateSelection {
               max: DateTime!
               min: DateTime!
+              values: [DateTime]
             }
 
             type DeleteInfo {
@@ -79,17 +80,20 @@ describe("Null", () => {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             type Movie {
@@ -292,6 +296,7 @@ describe("Null", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {

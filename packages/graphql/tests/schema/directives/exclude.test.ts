@@ -160,6 +160,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {
@@ -265,6 +266,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {
@@ -385,6 +387,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {
@@ -514,6 +517,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {
@@ -766,6 +770,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {
@@ -882,6 +887,7 @@ describe("Exclude", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {

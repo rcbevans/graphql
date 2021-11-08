@@ -54,6 +54,7 @@ describe("Aggregations", () => {
               average: BigInt!
               max: BigInt!
               min: BigInt!
+              values: [BigInt]
             }
 
             type CreateInfo {
@@ -73,6 +74,7 @@ describe("Aggregations", () => {
             type DateTimeAggregateSelection {
               max: DateTime!
               min: DateTime!
+              values: [DateTime]
             }
 
             type DeleteInfo {
@@ -87,23 +89,27 @@ describe("Aggregations", () => {
             type DurationAggregateSelection {
               max: Duration!
               min: Duration!
+              values: [Duration]
             }
 
             type FloatAggregateSelection {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             \\"\\"\\"A local datetime, represented as 'YYYY-MM-DDTHH:MM:SS'\\"\\"\\"
@@ -112,6 +118,7 @@ describe("Aggregations", () => {
             type LocalDateTimeAggregateSelection {
               max: LocalDateTime!
               min: LocalDateTime!
+              values: [LocalDateTime]
             }
 
             \\"\\"\\"A local time, represented as a time string without timezone information\\"\\"\\"
@@ -120,6 +127,7 @@ describe("Aggregations", () => {
             type LocalTimeAggregateSelection {
               max: LocalTime!
               min: LocalTime!
+              values: [LocalTime]
             }
 
             type Movie {
@@ -307,6 +315,7 @@ describe("Aggregations", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             \\"\\"\\"A time, represented as an RFC3339 time string\\"\\"\\"
@@ -315,6 +324,7 @@ describe("Aggregations", () => {
             type TimeAggregateSelection {
               max: Time!
               min: Time!
+              values: [Time]
             }
 
             type UpdateInfo {

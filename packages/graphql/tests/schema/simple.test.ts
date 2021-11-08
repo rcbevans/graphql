@@ -62,17 +62,20 @@ describe("Simple", () => {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             type Movie {

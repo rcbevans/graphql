@@ -60,6 +60,7 @@ describe("Default", () => {
             type DateTimeAggregateSelection {
               max: DateTime!
               min: DateTime!
+              values: [DateTime]
             }
 
             type DeleteInfo {
@@ -72,17 +73,20 @@ describe("Default", () => {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             type Mutation {
@@ -107,6 +111,7 @@ describe("Default", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {

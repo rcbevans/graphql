@@ -46,6 +46,7 @@ describe("Bigint", () => {
               average: BigInt!
               max: BigInt!
               min: BigInt!
+              values: [BigInt]
             }
 
             type CreateFilesMutationResponse {
@@ -144,6 +145,7 @@ describe("Bigint", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateFilesMutationResponse {

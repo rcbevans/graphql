@@ -59,6 +59,7 @@ describe("Private", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Mutation {

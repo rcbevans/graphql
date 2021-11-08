@@ -59,6 +59,7 @@ describe("Localdatetime", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             \\"\\"\\"A local datetime, represented as 'YYYY-MM-DDTHH:MM:SS'\\"\\"\\"
@@ -67,6 +68,7 @@ describe("Localdatetime", () => {
             type LocalDateTimeAggregateSelection {
               max: LocalDateTime!
               min: LocalDateTime!
+              values: [LocalDateTime]
             }
 
             type Movie {

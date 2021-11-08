@@ -89,6 +89,7 @@ describe("Comments", () => {
               average: Float!
               max: Float!
               min: Float!
+              values: [Float]
             }
 
             \\"\\"\\"An enumeration of movie genres.\\"\\"\\"
@@ -101,12 +102,14 @@ describe("Comments", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type IntAggregateSelection {
               average: Float!
               max: Int!
               min: Int!
+              values: [Int]
             }
 
             \\"\\"\\"A type describing a movie.\\"\\"\\"

@@ -119,6 +119,7 @@ describe("Unions", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {

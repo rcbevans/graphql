@@ -116,6 +116,7 @@ describe("Relationship", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {
@@ -278,6 +279,7 @@ describe("Relationship", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {
@@ -478,6 +480,7 @@ describe("Relationship", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {
@@ -647,6 +650,7 @@ describe("Relationship", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateActorsMutationResponse {

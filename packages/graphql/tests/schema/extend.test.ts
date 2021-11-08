@@ -62,6 +62,7 @@ describe("Extend", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {
@@ -145,6 +146,7 @@ describe("Extend", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {

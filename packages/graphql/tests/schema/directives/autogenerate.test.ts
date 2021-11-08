@@ -59,6 +59,7 @@ describe("Autogenerate", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {
@@ -140,6 +141,7 @@ describe("Autogenerate", () => {
             type StringAggregateSelection {
               longest: String!
               shortest: String!
+              values: [String]
             }
 
             type UpdateInfo {

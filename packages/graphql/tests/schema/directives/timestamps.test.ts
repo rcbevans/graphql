@@ -57,6 +57,7 @@ describe("Timestamps", () => {
             type DateTimeAggregateSelection {
               max: DateTime!
               min: DateTime!
+              values: [DateTime]
             }
 
             type DeleteInfo {
@@ -68,6 +69,7 @@ describe("Timestamps", () => {
             type IDAggregateSelection {
               longest: ID!
               shortest: ID!
+              values: [ID]
             }
 
             type Movie {
