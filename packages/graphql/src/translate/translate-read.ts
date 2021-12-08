@@ -31,9 +31,13 @@ function translateRead({ node, context }: { context: Context; node: Node }): [st
     const whereInput = resolveTree.args.where as GraphQLWhereArg;
     const optionsInput = resolveTree.args.options as GraphQLOptionsArg;
 
+    const hasOffset = Boolean(optionsInput?.offset) || optionsInput?.offset === 0;
+    const hasLimit = Boolean(optionsInput?.limit) || optionsInput?.limit === 0;
+
     const labels = node.labelString;
 
     const varName = "this";
+    const limitOrderVarName = "this_sort";
     const matchStr = `MATCH (${varName}${labels})`;
     let whereStr = "";
     let authStr = "";
@@ -42,6 +46,7 @@ function translateRead({ node, context }: { context: Context; node: Node }): [st
     let sortStr = "";
     let projAuth = "";
     let projStr = "";
+    let limitOrderProjStr = "";
     let cypherParams: { [k: string]: any } = {};
     const whereStrs: string[] = [];
     const connectionStrs: string[] = [];
@@ -120,9 +125,6 @@ function translateRead({ node, context }: { context: Context; node: Node }): [st
     }
 
     if (optionsInput) {
-        const hasOffset = Boolean(optionsInput.offset) || optionsInput.offset === 0;
-        const hasLimit = Boolean(optionsInput.limit) || optionsInput.limit === 0;
-
         if (hasOffset) {
             offsetStr = `SKIP $${varName}_offset`;
             cypherParams[`${varName}_offset`] = optionsInput.offset;
@@ -134,11 +136,27 @@ function translateRead({ node, context }: { context: Context; node: Node }): [st
         }
 
         if (optionsInput.sort && optionsInput.sort.length) {
+            if (hasLimit) {
+                const sortFields = optionsInput.sort.map((sort) => Object.keys(sort)[0]);
+                const orderByProjection = createProjectionAndParams({
+                    node,
+                    context,
+                    fieldsByTypeName: {
+                        [node.name]: Object.fromEntries(
+                            Object.entries(fieldsByTypeName[node.name]).filter(([key]) => sortFields.includes(key))
+                        ),
+                    },
+                    varName,
+                });
+                [limitOrderProjStr] = orderByProjection;
+                cypherParams = { ...cypherParams, ...orderByProjection[1] };
+            }
+
             const sortArr = optionsInput.sort.reduce((res: string[], sort: GraphQLSortArg) => {
                 return [
                     ...res,
                     ...Object.entries(sort).map(([field, direction]) => {
-                        return `${varName}.${field} ${direction}`;
+                        return `${hasLimit ? limitOrderVarName : varName}.${field} ${direction}`;
                     }),
                 ];
             }, []);
@@ -147,17 +165,35 @@ function translateRead({ node, context }: { context: Context; node: Node }): [st
         }
     }
 
-    const cypher = [
-        matchStr,
-        whereStr,
-        authStr,
-        ...(sortStr ? [`WITH ${varName}`, sortStr] : []),
-        ...(projAuth ? [`WITH ${varName}`, projAuth] : []),
-        ...connectionStrs,
-        `RETURN ${varName} ${projStr} as ${varName}`,
-        offsetStr,
-        limitStr,
-    ];
+    let cypher: string[] = [];
+
+    if (!hasLimit) {
+        cypher = [
+            matchStr,
+            whereStr,
+            authStr,
+            ...(sortStr ? [`WITH ${varName}`, sortStr] : []),
+            ...(projAuth ? [`WITH ${varName}`, projAuth] : []),
+            ...connectionStrs,
+            `RETURN ${varName} ${projStr} as ${varName}`,
+            offsetStr,
+        ];
+    } else {
+        cypher = [
+            "CALL {",
+            matchStr,
+            whereStr,
+            authStr,
+            ...(sortStr ? [`WITH ${varName}, ${varName} ${limitOrderProjStr} AS ${limitOrderVarName}`, sortStr] : []),
+            ...(projAuth ? [`WITH ${varName}`, projAuth] : []),
+            `RETURN ${varName}`,
+            offsetStr,
+            limitStr,
+            "}",
+            ...connectionStrs,
+            `RETURN ${varName} ${projStr} as ${varName}`,
+        ];
+    }
 
     return [cypher.filter(Boolean).join("\n"), cypherParams];
 }
