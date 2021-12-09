@@ -23,6 +23,17 @@ import { JwtPayload } from "jsonwebtoken";
 import { Driver, Integer } from "neo4j-driver";
 import { Neo4jGraphQL } from "./classes";
 
+export type CypherStatementResolver<TContext = any, TArgs = Record<string, any>> = (
+    context: TContext,
+    args: TArgs
+) => string;
+
+export type CypherStatementResolvers<TContext = any, TArgs = any> = {
+    [key: string]: {
+        [key: string]: CypherStatementResolver<TContext, TArgs>;
+    };
+};
+
 export type DriverConfig = {
     database?: string;
     bookmarks?: string | string[];
@@ -126,7 +137,7 @@ export interface ConnectionField extends BaseField {
  * Representation of the `@cypher` directive and its meta.
  */
 export interface CypherField extends BaseField {
-    statement: string;
+    statement?: string;
 }
 
 /**
