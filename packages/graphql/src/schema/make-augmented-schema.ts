@@ -346,6 +346,16 @@ function makeAugmentedSchema(
             }
         });
 
+        nodeFields.cypherFields
+            .filter((cypherField) => !cypherField.statement)
+            .forEach((cypherField) => {
+                if (!cypherStatementResolvers[node.name]?.[cypherField.fieldName]) {
+                    throw new Error(
+                        `Field ${cypherField.fieldName} on type ${node.name} has @cypher directive, but no statement, and no cypherStatementResolver provided`
+                    );
+                }
+            });
+
         if (!pointInTypeDefs) {
             pointInTypeDefs = nodeFields.pointFields.some((field) => field.typeMeta.name === "Point");
         }
