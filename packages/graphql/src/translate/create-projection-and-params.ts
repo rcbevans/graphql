@@ -172,6 +172,8 @@ function createProjectionAndParams({
         if (cypherField) {
             const projectionAuthStrs: string[] = [];
             const unionWheres: string[] = [];
+            const { cypherStatementResolvers } = context.neoSchema;
+
             let projectionStr = "";
 
             const isArray = cypherField.typeMeta.array;
@@ -290,11 +292,26 @@ function createProjectionAndParams({
             const apocParamsStr = `{this: ${chainStr || varName}${
                 apocParams.strs.length ? `, ${apocParams.strs.join(", ")}` : ""
             }}`;
-            const apocStr = `${!isPrimitive && !isEnum && !isScalar ? `${param} IN` : ""} apoc.cypher.runFirstColumn("${
-                cypherField.statement
-            }", ${apocParamsStr}, ${expectMultipleValues})${apocWhere ? ` ${apocWhere}` : ""}${
-                unionWhere ? ` ${unionWhere} ` : ""
-            }${projectionStr ? ` | ${!referenceUnion ? param : ""} ${projectionStr}` : ""}`;
+
+            let cypherStatement = cypherField.statement;
+            if (!cypherStatement) {
+                const resolver = cypherStatementResolvers[node.name]?.[cypherField.fieldName];
+                if (!resolver) {
+                    throw new Error(
+                        `Missing cypher statement resolver for field ${cypherField.fieldName} on type ${node.name}`
+                    );
+                }
+
+                cypherStatement = resolver(context, field.args);
+            }
+
+            const apocStr = `${
+                !isPrimitive && !isEnum && !isScalar ? `${param} IN` : ""
+            } apoc.cypher.runFirstColumn("${cypherStatement}", ${apocParamsStr}, ${expectMultipleValues})${
+                apocWhere ? ` ${apocWhere}` : ""
+            }${unionWhere ? ` ${unionWhere} ` : ""}${
+                projectionStr ? ` | ${!referenceUnion ? param : ""} ${projectionStr}` : ""
+            }`;
 
             if (isPrimitive || isEnum || isScalar) {
                 res.projection.push(`${key}: ${apocStr}`);

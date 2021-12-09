@@ -22,7 +22,7 @@ import { Driver } from "neo4j-driver";
 import { DocumentNode, GraphQLResolveInfo, GraphQLSchema, parse, printSchema, print } from "graphql";
 import { addResolversToSchema, addSchemaLevelResolver, IExecutableSchemaDefinition } from "@graphql-tools/schema";
 import { SchemaDirectiveVisitor } from "@graphql-tools/utils";
-import type { DriverConfig, CypherQueryOptions } from "../types";
+import type { DriverConfig, CypherQueryOptions, CypherStatementResolvers, Context } from "../types";
 import { makeAugmentedSchema } from "../schema";
 import Node from "./Node";
 import Relationship from "./Relationship";
@@ -50,6 +50,7 @@ export interface Neo4jGraphQLConfig {
 
 export interface Neo4jGraphQLConstructor extends Omit<IExecutableSchemaDefinition, "schemaDirectives"> {
     config?: Neo4jGraphQLConfig;
+    cypherStatementResolvers?: CypherStatementResolvers<Context, any>;
     driver?: Driver;
     schemaDirectives?: Record<string, typeof SchemaDirectiveVisitor>;
 }
@@ -63,19 +64,35 @@ class Neo4jGraphQL {
 
     public document: DocumentNode;
 
+    public cypherStatementResolvers: CypherStatementResolvers<Context, any>;
+
     private driver?: Driver;
 
     public config?: Neo4jGraphQLConfig;
 
     constructor(input: Neo4jGraphQLConstructor) {
-        const { config = {}, driver, resolvers, schemaDirectives, ...schemaDefinition } = input;
-        const { nodes, relationships, schema } = makeAugmentedSchema(schemaDefinition, {
-            enableRegex: config.enableRegex,
-            skipValidateTypeDefs: config.skipValidateTypeDefs,
-        });
+        const {
+            config = {},
+            cypherStatementResolvers = {},
+            driver,
+            resolvers,
+            schemaDirectives,
+            ...schemaDefinition
+        } = input;
+        const { nodes, relationships, schema } = makeAugmentedSchema(
+            {
+                ...schemaDefinition,
+                cypherStatementResolvers,
+            },
+            {
+                enableRegex: config.enableRegex,
+                skipValidateTypeDefs: config.skipValidateTypeDefs,
+            }
+        );
 
         this.driver = driver;
         this.config = config;
+        this.cypherStatementResolvers = cypherStatementResolvers;
         this.nodes = nodes;
         this.relationships = relationships;
         this.schema = schema;

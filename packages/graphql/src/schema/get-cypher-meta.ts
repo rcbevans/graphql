@@ -20,24 +20,23 @@
 import { FieldDefinitionNode } from "graphql";
 
 type CypherMeta = {
-    statement: string;
+    statement?: string;
 };
 
 function getCypherMeta(field: FieldDefinitionNode): CypherMeta | undefined {
+    let statement: string | undefined;
+
     const directive = field.directives?.find((x) => x.name.value === "cypher");
     if (!directive) {
         return undefined;
     }
 
     const stmtArg = directive.arguments?.find((x) => x.name.value === "statement");
-    if (!stmtArg) {
-        throw new Error("@cypher statement required");
-    }
-    if (stmtArg.value.kind !== "StringValue") {
+    if (stmtArg && stmtArg.value.kind === "StringValue") {
+        statement = stmtArg.value.value;
+    } else if (stmtArg) {
         throw new Error("@cypher statement not a string");
     }
-
-    const statement = stmtArg.value.value;
 
     return {
         statement,

@@ -48,7 +48,7 @@ import {
 import pluralize from "pluralize";
 import { Node, Exclude } from "../classes";
 import getAuth from "./get-auth";
-import { PrimitiveField, Auth, ConnectionQueryArgs } from "../types";
+import { PrimitiveField, Auth, ConnectionQueryArgs, CypherStatementResolvers } from "../types";
 import {
     aggregateResolver,
     countResolver,
@@ -76,7 +76,11 @@ import NodeDirective from "../classes/NodeDirective";
 import parseNodeDirective from "./parse-node-directive";
 
 function makeAugmentedSchema(
-    { typeDefs, ...schemaDefinition }: IExecutableSchemaDefinition,
+    {
+        typeDefs,
+        cypherStatementResolvers = {},
+        ...schemaDefinition
+    }: IExecutableSchemaDefinition & { cypherStatementResolvers?: CypherStatementResolvers<any, any> },
     { enableRegex, skipValidateTypeDefs }: { enableRegex?: boolean; skipValidateTypeDefs?: boolean } = {}
 ): { schema: GraphQLSchema; nodes: Node[]; relationships: Relationship[] } {
     const document = mergeTypeDefs(Array.isArray(typeDefs) ? (typeDefs as string[]) : [typeDefs as string]);
@@ -364,6 +368,16 @@ function makeAugmentedSchema(
                 relationshipPropertyInterfaceNames.add(relationship.properties);
             }
         });
+
+        nodeFields.cypherFields
+            .filter((cypherField) => !cypherField.statement)
+            .forEach((cypherField) => {
+                if (!cypherStatementResolvers[node.name]?.[cypherField.fieldName]) {
+                    throw new Error(
+                        `Field ${cypherField.fieldName} on type ${node.name} has @cypher directive, but no statement, and no cypherStatementResolver provided`
+                    );
+                }
+            });
 
         if (!pointInTypeDefs) {
             pointInTypeDefs = nodeFields.pointFields.some((field) => field.typeMeta.name === "Point");
@@ -1356,6 +1370,11 @@ function makeAugmentedSchema(
             objectComposer.addFields(objectComposeFields);
 
             objectFields.cypherFields.forEach((field) => {
+                if (!field.statement && !cypherStatementResolvers[type]?.[field.fieldName]) {
+                    throw new Error(
+                        `Field ${field.fieldName} has @cypher directive, but no statement, and no cypherStatementResolver provided`
+                    );
+                }
                 const customResolver = cypherResolver({
                     field,
                     statement: field.statement,

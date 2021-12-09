@@ -34,12 +34,15 @@ export default function cypherResolver({
     type,
 }: {
     field: BaseField;
-    statement: string;
+    statement?: string;
     type: "Query" | "Mutation";
 }) {
     async function resolve(_root: any, args: any, _context: unknown) {
         const context = _context as Context;
-        const { resolveTree } = context;
+        const {
+            resolveTree,
+            neoSchema: { cypherStatementResolvers },
+        } = context;
         const cypherStrs: string[] = [];
         const connectionProjectionStrs: string[] = [];
         let projectionStr = "";
@@ -149,6 +152,8 @@ export default function cypherResolver({
             projectionStr = `${headStrs.join(" + ")}`;
         }
 
+        const cypherStatement = statement || cypherStatementResolvers[type][field.fieldName](context, args);
+
         const initApocParamsStrs = ["auth: $auth", ...(context.cypherParams ? ["cypherParams: $cypherParams"] : [])];
         const apocParams = Object.entries(args).reduce(
             (r: { strs: string[]; params: any }, entry) => {
@@ -164,13 +169,13 @@ export default function cypherResolver({
         const expectMultipleValues = !isPrimitive && !isScalar && !isEnum && isArray ? "true" : "false";
         if (type === "Query") {
             cypherStrs.push(`
-                WITH apoc.cypher.runFirstColumn("${statement}", ${apocParamsStr}, ${expectMultipleValues}) as x
+                WITH apoc.cypher.runFirstColumn("${cypherStatement}", ${apocParamsStr}, ${expectMultipleValues}) as x
                 UNWIND x as this
                 WITH this
             `);
         } else {
             cypherStrs.push(`
-                CALL apoc.cypher.doIt("${statement}", ${apocParamsStr}) YIELD value
+                CALL apoc.cypher.doIt("${cypherStatement}", ${apocParamsStr}) YIELD value
                 WITH apoc.map.values(value, [keys(value)[0]])[0] AS this
             `);
         }
